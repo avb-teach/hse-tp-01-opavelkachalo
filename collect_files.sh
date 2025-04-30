@@ -3,7 +3,7 @@
 argc=$#
 
 if [ $argc -lt 2 ]; then
-    echo 'Usage: ./collect_files.sh <source> <dest> [--max_depth=N]' >&2
+    echo 'Usage: collect_files.sh <source> <dest> [--max_depth=N]' >&2
     exit 1
 fi
 
@@ -16,7 +16,7 @@ if [ $argc -eq 3 ]; then
         max_depth=${third_arg:12}
     else
         echo "Error: Incorrect argument ${3}" >&2
-        echo 'Usage: ./collect_files.sh <source> <dest> [--max_depth=N]' >&2
+        echo 'Usage: collect_files.sh <source> <dest> [--max_depth=N]' >&2
         exit 1
     fi
 else
@@ -33,4 +33,30 @@ if [ ! -e $dest ]; then
 elif [ ! -d $dest ]; then
     echo "Error: $dest is not a directory" >&2
     exit 1
+fi
+
+# don't forget about hidden files
+cp_files_1 () {
+    local init_dir=$1
+    for f in `ls $init_dir`; do
+        if [ -d $init_dir/$f ]; then
+            cp_files_1 $init_dir/$f
+        elif [ -f $dest/$f ]; then
+            local prefix=${f%%.*}
+            local suffix=${f#*.}
+            local i=1
+            local filename=$prefix$i.$suffix
+            while [ -f $dest/$filename ]; do
+                i=$((i+1))
+                filename=$prefix$i.$suffix
+            done
+            cp $init_dir/$f $dest/$filename
+        else
+            cp $init_dir/$f $dest
+        fi
+    done
+}
+
+if [ $max_depth -eq 1 ]; then
+    cp_files_1 $source
 fi
