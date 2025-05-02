@@ -74,7 +74,7 @@ rm_empty_dirs () {
     local init_dir=$1
     local elem_count=$(find $init_dir -mindepth 1 | wc -l)
     while true; do
-        find output_dir -type d -empty -exec rm -rf {} +
+        find $init_dir -type d -empty -exec rm -rf {} +
         if [ $elem_count -eq $(find $init_dir -mindepth 1 | wc -l) ]; then
             break
         fi
