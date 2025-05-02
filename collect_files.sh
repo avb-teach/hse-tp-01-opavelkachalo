@@ -11,7 +11,7 @@ source=$1
 dest=$2
 
 if [ $argc -ge 3 ]; then
-    max_depth=$3
+    max_depth=$4
 else
     max_depth=1
 fi
