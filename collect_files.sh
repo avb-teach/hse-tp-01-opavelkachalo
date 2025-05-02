@@ -8,7 +8,15 @@ if [ $argc -lt 2 ]; then
 fi
 
 source=$1
+if [ ${source: -1:1} == '/' ]; then
+    len=${#source}
+    source=${source:0:$((len-1))}
+fi
 dest=$2
+if [ ${dest: -1:1} == '/' ]; then
+    len=${#dest}
+    dest=${dest:0:$((len-1))}
+fi
 
 if [ $argc -ge 3 ]; then
     max_depth=$4
@@ -26,6 +34,8 @@ if [ ! -e $dest ]; then
 elif [ ! -d $dest ]; then
     echo "Error: $dest is not a directory" >&2
     exit 1
+else
+    rm -r $dest/*
 fi
 
 cp_files_1 () {
