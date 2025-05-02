@@ -72,12 +72,13 @@ cp_files () {
 
 rm_empty_dirs () {
     local init_dir=$1
-    for f in $init_dir/*; do
-        if [ -d $f ]; then
-            if ! rmdir $f 2&>/dev/null; then
-                rm_empty_dirs $f
-            fi
+    local elem_count=$(find $init_dir -mindepth 1 | wc -l)
+    while true; do
+        find output_dir -type d -empty -exec rm -rf {} +
+        if [ $elem_count -eq $(find $init_dir -mindepth 1 | wc -l) ]; then
+            break
         fi
+        elem_count=$(find $init_dir -mindepth 1 | wc -l)
     done
 }
 
