@@ -11,14 +11,15 @@ source=$1
 dest=$2
 
 if [ $argc -eq 3 ]; then
-    if [[ $3 =~ ^--max_depth=[0-9]+ ]]; then
-        third_arg=$3
-        max_depth=${third_arg:12}
-    else
-        echo "Error: Incorrect argument \"$3\"" >&2
-        echo 'Usage: collect_files.sh <source> <dest> [--max_depth=N]' >&2
-        exit 1
-    fi
+    # if [[ $3 =~ ^--max_depth=[0-9]+ ]]; then
+    #     third_arg=$3
+    #     max_depth=${third_arg:12}
+    # else
+    #     echo "Error: Incorrect argument \"$3\"" >&2
+    #     echo 'Usage: collect_files.sh <source> <dest> [--max_depth=N]' >&2
+    #     exit 1
+    # fi
+    max_depth=$3
 else
     max_depth=1
 fi
