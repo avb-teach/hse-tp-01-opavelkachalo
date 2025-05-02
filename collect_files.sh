@@ -15,7 +15,7 @@ if [ $argc -eq 3 ]; then
         third_arg=$3
         max_depth=${third_arg:12}
     else
-        echo "Error: Incorrect argument ${3}" >&2
+        echo "Error: Incorrect argument \"$3\"" >&2
         echo 'Usage: collect_files.sh <source> <dest> [--max_depth=N]' >&2
         exit 1
     fi
@@ -35,7 +35,6 @@ elif [ ! -d $dest ]; then
     exit 1
 fi
 
-# don't forget about hidden files
 cp_files_1 () {
     local init_dir=$1
     for f in `ls $init_dir`; do
@@ -57,6 +56,42 @@ cp_files_1 () {
     done
 }
 
+cp_files () {
+    local init_dir=$1
+    local depth=$2
+    for f in `ls $init_dir`; do
+        if [ -d $init_dir/$f ]; then
+            cp_files $init_dir/$f $((depth+1))
+        elif [ $depth -gt $max_depth ]; then
+            IFS='/' read -ra path_array <<< $init_dir/$f
+            tmp_path=${path_array[0]}
+            i=$(($depth-$max_depth+1))
+            while [ $i -lt $depth ]; do
+                tmp_path=$tmp_path/${path_array[$i]}
+                mkdir $tmp_path
+                i=$((i+1))
+            done
+            tmp_path=$tmp_path/${path_array[$i]}
+            mv $init_dir/$f $tmp_path
+        fi
+    done
+}
+
+rm_empty_dirs () {
+    local init_dir=$1
+    for f in $init_dir/*; do
+        if [ -d $f ]; then
+            if ! rmdir $f 2&>/dev/null; then
+                rm_empty_dirs $f
+            fi
+        fi
+    done
+}
+
 if [ $max_depth -eq 1 ]; then
     cp_files_1 $source
+else
+    cp -r $source/* $dest
+    cp_files $dest 1
+    rm_empty_dirs $dest
 fi
